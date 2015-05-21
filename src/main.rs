@@ -2,11 +2,13 @@
 
 extern crate rustc_serialize;
 extern crate rusqlite;
+extern crate threadpool;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
+use threadpool::ThreadPool;
 
 #[derive(Debug)]
 struct Command {
@@ -15,9 +17,9 @@ struct Command {
     file: String,
 }
 
-struct CommandIndexJob {
-    comm: Command,
-    context: String,
+enum CommandIndexJob {
+    Stop,
+    IndexSource{ comm: Command, context: String },
 }
 
 enum SqliteJob {
@@ -88,7 +90,7 @@ fn main() {
     //hitTheFile(cmd,"moo".to_string());
     use rusqlite::SqliteConnection;
 
-    let (txJob,rxJob) = channel();
+    let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
     let inst = MyAppInstance {
         indexSender: txJob,
@@ -102,12 +104,28 @@ fn main() {
             let res = rxQuery.recv().unwrap();
             match res {
                 SqliteJob::Stop => {
-                    keepGoing = false
+                    keepGoing = false;
                 },
                 SqliteJob::RunQuery(msg) => {
                     dbConn.execute(&msg,&[]);
                 }
             }
+        }
+    });
+
+    thread::spawn(move|| {
+        let pool = ThreadPool::new(8);
+        let mut keepGoing = true;
+        while (keepGoing) {
+            let res = rxJob.recv().unwrap();
+            match res {
+                CommandIndexJob::Stop => {
+                    keepGoing = false;
+                },
+                CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
+
+                },
+            };
         }
     });
 

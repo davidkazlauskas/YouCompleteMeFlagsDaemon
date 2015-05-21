@@ -5,6 +5,7 @@ use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 
+#[derive(Debug)]
 struct Command {
     dir: String,
     command: String,
@@ -34,6 +35,8 @@ fn parseCommands(string: &String) -> Vec<Command> {
             file: obj.get("file").unwrap()
                 .as_string().unwrap().to_string(),
         };
+        println!("{:?}",comm);
+        commands.push(comm);
     }
     commands
 }

@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-//use std::sync::mspc::channel;
+extern crate rustc_serialize;
 use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};

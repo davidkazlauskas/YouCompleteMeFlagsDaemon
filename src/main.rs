@@ -20,9 +20,14 @@ struct CommandIndexJob {
     context: String,
 }
 
+enum SqliteJob {
+    Stop,
+    RunQuery(String),
+}
+
 struct MyAppInstance {
     indexSender: Sender<CommandIndexJob>,
-    sqliteQuerySender: Sender<String>,
+    sqliteQuerySender: Sender<SqliteJob>,
 }
 
 fn handleStream(mut stream: TcpStream) {
@@ -84,13 +89,27 @@ fn main() {
     use rusqlite::SqliteConnection;
 
     let (txJob,rxJob) = channel();
-    let (txQuery,rxQuery) = channel();
+    let (txQuery,rxQuery) = channel::<SqliteJob>();
     let inst = MyAppInstance {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
     };
 
     let dbConn = SqliteConnection::open_in_memory().unwrap();
+    thread::spawn(move|| {
+        let mut keepGoing = true;
+        while (keepGoing) {
+            let res = rxQuery.recv().unwrap();
+            match res {
+                SqliteJob::Stop => {
+                    keepGoing = false
+                },
+                SqliteJob::RunQuery(msg) => {
+                    dbConn.execute(&msg,&[]);
+                }
+            }
+        }
+    });
 
     listen(inst);
 }

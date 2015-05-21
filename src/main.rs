@@ -70,6 +70,10 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     let mut contents = String::with_capacity(1024 * 64);
     f.read_to_string(&mut contents);
     let parseRes = parseCommands(&contents);
+    for i in parseRes {
+        send.send(CommandIndexJob::IndexSource{
+            comm: i, context: projectName.clone() });
+    }
 }
 
 fn indexSource(comm: Command,send: Sender<SqliteJob>) {

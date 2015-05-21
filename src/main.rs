@@ -63,7 +63,7 @@ fn hitTheFile(filepath: String,projectName: String) {
     let parseRes = parseCommands(&contents);
 }
 
-fn listen() {
+fn listen(inst: MyAppInstance) {
     let listener = TcpListener::bind("127.0.0.1:7777").unwrap();
     for stream in listener.incoming() {
         match stream {
@@ -78,8 +78,8 @@ fn listen() {
 }
 
 fn main() {
-    let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
-    hitTheFile(cmd,"moo".to_string());
+    //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
+    //hitTheFile(cmd,"moo".to_string());
 
     let (txJob,rxJob) = channel();
     let (txQuery,rxQuery) = channel();
@@ -87,4 +87,6 @@ fn main() {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
     };
+
+    listen(inst);
 }

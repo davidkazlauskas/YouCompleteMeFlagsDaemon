@@ -27,9 +27,9 @@ fn hitTheFile(filepath: String,projectName: String) {
     use std::fs::File;
 
     let mut f = File::create(filepath).unwrap();
-    let contents = String::with_capacity(1024 * 64);
-    //f.read_to_string(&mut contents);
-    //parseCommands(contents);
+    let mut contents = String::with_capacity(1024 * 64);
+    f.read_to_string(&mut contents);
+    parseCommands(&contents);
 }
 
 fn listen() {

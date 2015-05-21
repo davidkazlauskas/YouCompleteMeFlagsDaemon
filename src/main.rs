@@ -1,6 +1,8 @@
 #![allow(non_snake_case)]
 
 extern crate rustc_serialize;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::Sender;
 use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
@@ -15,6 +17,11 @@ struct Command {
 struct CommandIndexJob {
     comm: Command,
     context: String,
+}
+
+struct MyAppInstance {
+    indexSender: Sender<CommandIndexJob>,
+    sqliteQuerySender: Sender<String>,
 }
 
 fn handleStream(mut stream: TcpStream) {
@@ -73,4 +80,11 @@ fn listen() {
 fn main() {
     let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
     hitTheFile(cmd,"moo".to_string());
+
+    let (txJob,rxJob) = channel();
+    let (txQuery,rxQuery) = channel();
+    let inst = MyAppInstance {
+        indexSender: txJob,
+        sqliteQuerySender: txQuery,
+    };
 }

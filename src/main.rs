@@ -97,7 +97,7 @@ fn listen(inst: MyAppInstance) {
 fn main() {
     use rusqlite::SqliteConnection;
 
-    let (txShutdown,rxShutdown) = channel::<i32>();
+    let (txShutdown,rxShutdown) = channel();
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
     let clonedTxJob = txJob.clone();
@@ -122,7 +122,7 @@ fn main() {
                 }
             }
         }
-        txShutdownCloneSqlite.send(1);
+        txShutdownCloneSqlite.send(0);
     });
 
     let txShutdownIndex = txShutdown.clone();
@@ -149,7 +149,7 @@ fn main() {
                 },
             };
         }
-        txShutdownIndex.send(1);
+        txShutdownIndex.send(0);
     });
 
     //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
@@ -159,5 +159,8 @@ fn main() {
         context: "shazzlow".to_string(),
     };
     inst.indexSender.send(jerb);
+
+    rxShutdown.recv();
+    rxShutdown.recv();
     //listen(inst);
 }

@@ -19,6 +19,7 @@ struct Command {
 
 enum CommandIndexJob {
     Stop,
+    ProcessCompCommands{ path: String, context: String },
     IndexSource{ comm: Command, context: String },
 }
 
@@ -121,6 +122,9 @@ fn main() {
             match res {
                 CommandIndexJob::Stop => {
                     keepGoing = false;
+                },
+                CommandIndexJob::ProcessCompCommands{ path: p, context: ctx } => {
+
                 },
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
 

@@ -19,6 +19,8 @@ fn handleStream(mut stream: TcpStream) {
 }
 
 fn parseCommands(string: &String) -> Vec<Command> {
+    use rustc_serialize::json::Json;
+    let data = Json::from_str(&string).unwrap();
     vec!()
 }
 

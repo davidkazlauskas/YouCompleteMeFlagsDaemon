@@ -12,6 +12,11 @@ struct Command {
     file: String,
 }
 
+struct CommandIndexJob {
+    comm: Command,
+    context: String,
+}
+
 fn handleStream(mut stream: TcpStream) {
     println!("DOIN IT");
     let mut theStr = String::with_capacity(1024 * 2);
@@ -48,7 +53,7 @@ fn hitTheFile(filepath: String,projectName: String) {
     let mut f = File::open(&filepath).unwrap();
     let mut contents = String::with_capacity(1024 * 64);
     f.read_to_string(&mut contents);
-    parseCommands(&contents);
+    let parseRes = parseCommands(&contents);
 }
 
 fn listen() {

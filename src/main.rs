@@ -31,5 +31,5 @@ fn listen() {
 }
 
 fn main() {
-    hitTheFile(String::from_str("boo"),String::from_str("moo"));
+    hitTheFile("moo".to_string(),"moo".to_string());
 }

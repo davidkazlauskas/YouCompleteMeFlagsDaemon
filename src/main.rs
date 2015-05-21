@@ -5,11 +5,21 @@ use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 
+struct Command {
+    dir: String,
+    command: String,
+    file: String,
+}
+
 fn handleStream(mut stream: TcpStream) {
     println!("DOIN IT");
     let mut theStr = String::with_capacity(1024 * 2);
     stream.read_to_string(&mut theStr);
     println!("{}",theStr);
+}
+
+fn parseCommands(string: String) -> Vec<Command> {
+    vec!()
 }
 
 fn hitTheFile(filepath: String,projectName: String) {
@@ -31,5 +41,6 @@ fn listen() {
 }
 
 fn main() {
-    hitTheFile("moo".to_string(),"moo".to_string());
+    let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
+    hitTheFile(cmd,"moo".to_string());
 }

@@ -62,7 +62,7 @@ fn parseCommands(string: &String) -> Vec<Command> {
     commands
 }
 
-fn hitTheFile(filepath: String,projectName: String) {
+fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>) {
     use std::io::prelude::*;
     use std::fs::File;
 
@@ -93,6 +93,7 @@ fn main() {
 
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
+    let clonedTxJob = txJob.clone();
     let inst = MyAppInstance {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
@@ -124,7 +125,10 @@ fn main() {
                     keepGoing = false;
                 },
                 CommandIndexJob::ProcessCompCommands{ path: p, context: ctx } => {
-
+                    let clonedTxJob = clonedTxJob.clone();
+                    pool.execute(move|| {
+                        hitTheFile(p,ctx,clonedTxJob);
+                    });
                 },
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
 

@@ -95,10 +95,9 @@ fn listen(inst: MyAppInstance) {
 }
 
 fn main() {
-    //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
-    //hitTheFile(cmd,"moo".to_string());
     use rusqlite::SqliteConnection;
 
+    let (txShutdown,rxShutdown) = channel::<i32>();
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
     let clonedTxJob = txJob.clone();
@@ -109,6 +108,7 @@ fn main() {
     };
 
     let dbConn = SqliteConnection::open_in_memory().unwrap();
+    let txShutdownCloneSqlite = txShutdown.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;
         while (keepGoing) {
@@ -122,8 +122,10 @@ fn main() {
                 }
             }
         }
+        txShutdownCloneSqlite.send(1);
     });
 
+    let txShutdownIndex = txShutdown.clone();
     thread::spawn(move|| {
         let pool = ThreadPool::new(8);
         let mut keepGoing = true;
@@ -142,12 +144,20 @@ fn main() {
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
                     let clonedTxQuery = clonedTxQuery.clone();
                     pool.execute(move|| {
-
+                        indexSource(cmd,clonedTxQuery);
                     });
                 },
             };
         }
+        txShutdownIndex.send(1);
     });
 
-    listen(inst);
+    //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
+    //hitTheFile(cmd,"moo".to_string());
+    let jerb = CommandIndexJob::ProcessCompCommands {
+        path: "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string(),
+        context: "shazzlow".to_string(),
+    };
+    inst.indexSender.send(jerb);
+    //listen(inst);
 }

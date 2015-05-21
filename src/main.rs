@@ -72,6 +72,10 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     let parseRes = parseCommands(&contents);
 }
 
+fn indexSource(comm: Command,send: Sender<SqliteJob>) {
+    println!("WOULD INDEX! {:?}",comm);
+}
+
 fn listen(inst: MyAppInstance) {
     let listener = TcpListener::bind("127.0.0.1:7777").unwrap();
     for stream in listener.incoming() {
@@ -94,6 +98,7 @@ fn main() {
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
     let clonedTxJob = txJob.clone();
+    let clonedTxQuery = txQuery.clone();
     let inst = MyAppInstance {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
@@ -131,7 +136,10 @@ fn main() {
                     });
                 },
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
+                    let clonedTxQuery = clonedTxQuery.clone();
+                    pool.execute(move|| {
 
+                    });
                 },
             };
         }

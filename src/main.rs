@@ -21,7 +21,21 @@ fn handleStream(mut stream: TcpStream) {
 fn parseCommands(string: &String) -> Vec<Command> {
     use rustc_serialize::json::Json;
     let data = Json::from_str(&string).unwrap();
-    vec!()
+
+    let mut commands = Vec::with_capacity(16);
+    let arr = data.as_array().unwrap();
+    for i in arr {
+        let obj = i.as_object().unwrap();
+        let comm = Command {
+            dir: obj.get("directory").unwrap()
+                .as_string().unwrap().to_string(),
+            command: obj.get("command").unwrap()
+                .as_string().unwrap().to_string(),
+            file: obj.get("file").unwrap()
+                .as_string().unwrap().to_string(),
+        };
+    }
+    commands
 }
 
 fn hitTheFile(filepath: String,projectName: String) {

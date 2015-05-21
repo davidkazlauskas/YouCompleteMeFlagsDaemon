@@ -45,7 +45,7 @@ fn hitTheFile(filepath: String,projectName: String) {
     use std::io::prelude::*;
     use std::fs::File;
 
-    let mut f = File::create(filepath).unwrap();
+    let mut f = File::open(&filepath).unwrap();
     let mut contents = String::with_capacity(1024 * 64);
     f.read_to_string(&mut contents);
     parseCommands(&contents);

@@ -97,7 +97,6 @@ fn listen(inst: MyAppInstance) {
 fn main() {
     use rusqlite::SqliteConnection;
 
-    let (txShutdown,rxShutdown) = channel();
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
     let clonedTxJob = txJob.clone();
@@ -108,7 +107,6 @@ fn main() {
     };
 
     let dbConn = SqliteConnection::open_in_memory().unwrap();
-    let txShutdownCloneSqlite = txShutdown.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;
         while (keepGoing) {
@@ -122,10 +120,8 @@ fn main() {
                 }
             }
         }
-        txShutdownCloneSqlite.send(0);
     });
 
-    let txShutdownIndex = txShutdown.clone();
     thread::spawn(move|| {
         let pool = ThreadPool::new(8);
         let mut keepGoing = true;
@@ -149,7 +145,6 @@ fn main() {
                 },
             };
         }
-        txShutdownIndex.send(0);
     });
 
     //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
@@ -160,7 +155,5 @@ fn main() {
     };
     inst.indexSender.send(jerb);
 
-    rxShutdown.recv();
-    rxShutdown.recv();
     //listen(inst);
 }

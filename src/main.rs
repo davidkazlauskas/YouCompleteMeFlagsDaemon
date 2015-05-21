@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 extern crate rustc_serialize;
+extern crate rusqlite;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::thread;
@@ -80,6 +81,7 @@ fn listen(inst: MyAppInstance) {
 fn main() {
     //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
     //hitTheFile(cmd,"moo".to_string());
+    use rusqlite::SqliteConnection;
 
     let (txJob,rxJob) = channel();
     let (txQuery,rxQuery) = channel();
@@ -87,6 +89,8 @@ fn main() {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
     };
+
+    let dbConn = SqliteConnection::open_in_memory().unwrap();
 
     listen(inst);
 }

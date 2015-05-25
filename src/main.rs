@@ -83,6 +83,7 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
     let dropOut = Regex::new("^(.*)\\-o[\\s\\w]+(\\-.*)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
+    println!("TWEAKED COMM! |{}|",replCmd);
 }
 
 fn listen(inst: MyAppInstance) {

@@ -81,7 +81,7 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
-    let dropOut = Regex::new(r"^(.*)\-o[\s\w]+(\-.*)$").unwrap();
+    let dropOut = Regex::new(r"^(.*)-o[\s\w]+(-.*)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
     println!("TWEAKED COMM! |{}|",replCmd);
 }

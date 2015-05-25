@@ -76,8 +76,8 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     }
 }
 
-fn indexSource(comm: Command,send: Sender<SqliteJob>) {
-    println!("WOULD INDEX! {:?}",comm);
+fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
+    println!("WOULD INDEX! |{}| {:?}",context,comm);
 }
 
 fn listen(inst: MyAppInstance) {
@@ -99,6 +99,7 @@ fn main() {
 
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
+    let (txEnd,rxEnd) = channel::<i32>();
     let clonedTxJob = txJob.clone();
     let clonedTxQuery = txQuery.clone();
     let inst = MyAppInstance {
@@ -107,6 +108,7 @@ fn main() {
     };
 
     let dbConn = SqliteConnection::open_in_memory().unwrap();
+    let dbEndClone = txEnd.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;
         while (keepGoing) {
@@ -120,8 +122,10 @@ fn main() {
                 }
             }
         }
+        dbEndClone.send(7);
     });
 
+    let idxEndClone = txEnd.clone();
     thread::spawn(move|| {
         let pool = ThreadPool::new(8);
         let mut keepGoing = true;
@@ -140,11 +144,12 @@ fn main() {
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
                     let clonedTxQuery = clonedTxQuery.clone();
                     pool.execute(move|| {
-                        indexSource(cmd,clonedTxQuery);
+                        indexSource(cmd,&ctx,clonedTxQuery);
                     });
                 },
             };
         }
+        idxEndClone.send(7);
     });
 
     //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
@@ -154,6 +159,14 @@ fn main() {
         context: "shazzlow".to_string(),
     };
     inst.indexSender.send(jerb);
+
+    // synchronize, one for db
+    // other for processing
+    std::thread::sleep_ms(500);
+    inst.indexSender.send(CommandIndexJob::Stop);
+    inst.sqliteQuerySender.send(SqliteJob::Stop);
+    rxEnd.recv();
+    rxEnd.recv();
 
     //listen(inst);
 }

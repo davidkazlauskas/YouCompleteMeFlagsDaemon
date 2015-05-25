@@ -79,10 +79,27 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     }
 }
 
+fn argArray(target: &str) -> Vec<String> {
+    let mut res = Vec::with_capacity(16);
+    let trimSpace = Regex::new(r"\s[\s]+").unwrap();
+    let iterRgx = Regex::new(r"([^\\] )?(.*?)[^\\] ").unwrap();
+    let repl = trimSpace.replace_all(target," ");
+    for cap in iterRgx.captures_iter(&repl) {
+        res.push(cap.at(2).unwrap().to_string());
+    }
+    res
+}
+
+#[test]
+fn test_arg_splitter() {
+
+}
+
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
     let dropOut = Regex::new(r"^(.*?)[\s]+-o[\s]+.*?\s(-.*?)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
+    //let replCmd = "ls -lh".to_string();
     println!("TWEAKED COMM! |{}|",replCmd);
 
     let output = std::process::Command::new(replCmd)

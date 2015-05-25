@@ -84,6 +84,10 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     let dropOut = Regex::new(r"^(.*?)[\s]+-o[\s]+.*?\s(-.*?)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
     println!("TWEAKED COMM! |{}|",replCmd);
+
+    let output = std::process::Command::new(replCmd).output().unwrap();
+    let headerString = String::from_utf8(output.stdout).unwrap();
+    println!("HEADERS! |{}|",headerString);
 }
 
 fn listen(inst: MyAppInstance) {

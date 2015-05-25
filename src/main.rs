@@ -82,7 +82,7 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
 fn argArray(target: &str) -> Vec<String> {
     let mut res = Vec::with_capacity(16);
     let trimSpace = Regex::new(r"\s[\s]+").unwrap();
-    let iterRgx = Regex::new(r"([^\\] )?(.*?)[^\\] ").unwrap();
+    let iterRgx = Regex::new(r"([^\\] )?(.*?[^\\]) ").unwrap();
     let repl = trimSpace.replace_all(target," ");
     for cap in iterRgx.captures_iter(&repl) {
         res.push(cap.at(2).unwrap().to_string());
@@ -92,7 +92,9 @@ fn argArray(target: &str) -> Vec<String> {
 
 #[test]
 fn test_arg_splitter() {
-
+    let out = argArray("g++ shazzlow\\ cxx -g -o yo.txt");
+    println!("|{}|",out[0]);
+    assert!( out[0] == "g++" );
 }
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {

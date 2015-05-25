@@ -83,9 +83,13 @@ fn argArray(target: &str) -> Vec<String> {
     let mut res = Vec::with_capacity(16);
     let trimSpace = Regex::new(r"\s[\s]+").unwrap();
     let iterRgx = Regex::new(r"([^\\] )?(.*?[^\\]) ").unwrap();
+    let tailRgx = Regex::new(r"[^\\] ([^\s]+)$").unwrap();
     let repl = trimSpace.replace_all(target," ");
     for cap in iterRgx.captures_iter(&repl) {
         res.push(cap.at(2).unwrap().to_string());
+    }
+    for cap in tailRgx.captures_iter(&repl) {
+        res.push(cap.at(1).unwrap().to_string());
     }
     res
 }
@@ -93,8 +97,12 @@ fn argArray(target: &str) -> Vec<String> {
 #[test]
 fn test_arg_splitter() {
     let out = argArray("g++ shazzlow\\ cxx -g -o yo.txt");
-    println!("|{}|",out[0]);
+    println!("|{}|",out[4]);
     assert!( out[0] == "g++" );
+    assert!( out[1] == "shazzlow\\ cxx" );
+    assert!( out[2] == "-g" );
+    assert!( out[3] == "-o" );
+    assert!( out[4] == "yo.txt" );
 }
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {

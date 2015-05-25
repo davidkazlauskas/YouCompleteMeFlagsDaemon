@@ -7,4 +7,5 @@ authors = ["David <davidkazlauskas@gmail.com>"]
 rustc-serialize = "0.3.14"
 rusqlite = "0.1.0"
 threadpool = "0.1.4"
+regex = "0.1.30"
 

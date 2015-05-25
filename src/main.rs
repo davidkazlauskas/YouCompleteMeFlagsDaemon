@@ -3,12 +3,15 @@
 extern crate rustc_serialize;
 extern crate rusqlite;
 extern crate threadpool;
+extern crate regex;
+
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use threadpool::ThreadPool;
+use regex::Regex;
 
 #[derive(Debug)]
 struct Command {
@@ -78,6 +81,8 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
+    let dropOut = Regex::new("^(.*)\\-o[\\s\\w]+(\\-.*)$").unwrap();
+    let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
 }
 
 fn listen(inst: MyAppInstance) {

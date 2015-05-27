@@ -154,6 +154,12 @@ fn main() {
     };
 
     let dbConn = SqliteConnection::open(&"flags.sqlite").unwrap();
+    dbConn.execute("CREATE TABLE IF NOT EXISTS flags(
+        CONTEXT  TEXT,
+        FILENAME TEXT,
+        DIR      TEXT,
+        FLAGS    TEXT
+    )",&[]);
     let dbEndClone = txEnd.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;

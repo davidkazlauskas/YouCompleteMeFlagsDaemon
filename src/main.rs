@@ -159,7 +159,7 @@ fn main() {
         FILENAME TEXT,
         DIR      TEXT,
         FLAGS    TEXT
-    )",&[]);
+    );",&[]);
     let dbEndClone = txEnd.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;

@@ -153,7 +153,7 @@ fn main() {
         sqliteQuerySender: txQuery,
     };
 
-    let dbConn = SqliteConnection::open_in_memory().unwrap();
+    let dbConn = SqliteConnection::open(&"flags.sqlite").unwrap();
     let dbEndClone = txEnd.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;

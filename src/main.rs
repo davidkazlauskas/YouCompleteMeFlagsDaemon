@@ -96,7 +96,7 @@ fn argArray(target: &str) -> Vec<String> {
 
 #[test]
 fn test_arg_splitter() {
-    let out = argArray("g++ shazzlow\\ cxx -g -o yo.txt");
+    let out = argArray("g++   shazzlow\\ cxx -g -o yo.txt");
     println!("|{}|",out[4]);
     assert!( out[0] == "g++" );
     assert!( out[1] == "shazzlow\\ cxx" );

@@ -111,9 +111,17 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
     //let replCmd = "ls -lh".to_string();
     println!("TWEAKED COMM! |{}|",replCmd);
+    let arr = argArray(&replCmd);
 
-    let output = std::process::Command::new(replCmd)
-        .current_dir(comm.dir).output().unwrap();
+    let mut procVar = std::process::Command::new(&arr[0]);
+    procVar.current_dir(comm.dir);
+
+    let argIter = arr.iter().skip(1);
+    for i in argIter {
+        procVar.arg(&*i);
+    }
+
+    let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
     println!("HEADERS! |{}|",headerString);
 }

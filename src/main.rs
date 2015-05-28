@@ -29,6 +29,7 @@ enum CommandIndexJob {
 enum SqliteJob {
     Stop,
     RunQuery(String),
+    InsertMany{ files: Vec<String>,context: String,flags: String },
 }
 
 struct MyAppInstance {
@@ -155,6 +156,7 @@ fn main() {
 
     let dbConn = SqliteConnection::open(&"flags.sqlite").unwrap();
     dbConn.execute("CREATE TABLE IF NOT EXISTS flags(
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
         CONTEXT  TEXT,
         FILENAME TEXT,
         DIR      TEXT,
@@ -171,7 +173,10 @@ fn main() {
                 },
                 SqliteJob::RunQuery(msg) => {
                     dbConn.execute(&msg,&[]);
-                }
+                },
+                SqliteJob::InsertMany{ files: vec, context: ctx, flags: flg } => {
+
+                },
             }
         }
         dbEndClone.send(7);

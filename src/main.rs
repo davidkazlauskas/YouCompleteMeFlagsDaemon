@@ -175,7 +175,8 @@ fn main() {
                     dbConn.execute(&msg,&[]);
                 },
                 SqliteJob::InsertMany{ files: vec, context: ctx, flags: flg } => {
-
+                    dbConn.execute("BEGIN;",&[]);
+                    dbConn.execute("COMMIT;",&[]);
                 },
             }
         }

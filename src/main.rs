@@ -113,7 +113,7 @@ fn parseFileList(theString: &str) -> Vec<String> {
     res
 }
 
-fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
+fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
     let dropOut = Regex::new(r"^(.*?)[\s]+-o[\s]+.*?\s(-.*?)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
@@ -122,7 +122,7 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     let arr = argArray(&replCmd);
 
     let mut procVar = std::process::Command::new(&arr[0]);
-    procVar.current_dir(comm.dir);
+    procVar.current_dir(&comm.dir);
 
     let argIter = arr.iter().skip(1);
     for i in argIter {
@@ -132,9 +132,18 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
 
-    let fileList = parseFileList(&headerString);
+    let mut fileList = parseFileList(&headerString);
+    fileList.push(comm.file);
 
-    println!("HEADERS! |{}|",headerString);
+    let jerb = SqliteJob::InsertMany{
+        files: fileList,
+        context: context,
+        dir: comm.dir,
+        flags: comm.command,
+    };
+
+    send.send(jerb);
+    //println!("HEADERS! |{}|",headerString);
 }
 
 fn listen(inst: MyAppInstance) {
@@ -222,7 +231,7 @@ fn main() {
                 CommandIndexJob::IndexSource{ comm: cmd, context: ctx } => {
                     let clonedTxQuery = clonedTxQuery.clone();
                     pool.execute(move|| {
-                        indexSource(cmd,&ctx,clonedTxQuery);
+                        indexSource(cmd,ctx,clonedTxQuery);
                     });
                 },
             };

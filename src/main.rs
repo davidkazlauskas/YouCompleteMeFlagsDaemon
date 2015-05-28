@@ -100,10 +100,10 @@ fn test_arg_splitter() {
 #[test]
 fn test_out_parser() {
     let theStr = "ChainFunctor.o: \n
-     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp \n
-     /usr/include/stdc-predef.h /usr/include/c++/4.9/cstring \n
+     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp \\
+     /usr/include/stdc-predef.h /usr/include/c++/4.9/cstring \\
      /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp \n
-     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\n";
+     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\\";
 
     let out = parseFileList(theStr);
     println!("|{}|",out[0]);
@@ -111,8 +111,8 @@ fn test_out_parser() {
 }
 
 fn parseFileList(theString: &str) -> Vec<String> {
-    let rgx = Regex::new(r"[^\\][\s]+(.*[^\\])[\s]+").unwrap();
-    let last = Regex::new(r".*[^\\][\s]+(.*)$").unwrap();
+    let rgx = Regex::new(r"[^\\][\s]+(.*?[^\\])[\s]+").unwrap();
+    let last = Regex::new(r".*[^\\][\s]+(.*?)[\s]+$").unwrap();
     let mut res = Vec::with_capacity(64);
 
     for i in rgx.captures_iter(theString) {

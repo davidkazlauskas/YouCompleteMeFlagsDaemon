@@ -132,7 +132,7 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
     let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
 
-    let fileList: Vec<String> = Vec::with_capacity(64);
+    let fileList = parseFileList(&headerString);
 
     println!("HEADERS! |{}|",headerString);
 }

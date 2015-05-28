@@ -97,9 +97,22 @@ fn test_arg_splitter() {
     assert!( out[2] == theStr );
 }
 
+#[test]
+fn test_out_parser() {
+    let theStr = "ChainFunctor.o: \n
+     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp \n
+     /usr/include/stdc-predef.h /usr/include/c++/4.9/cstring \n
+     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp \n
+     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\n";
+
+    let out = parseFileList(theStr);
+    println!("|{}|",out[0]);
+    assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp" );
+}
+
 fn parseFileList(theString: &str) -> Vec<String> {
-    let rgx = Regex::new(r"[^\\] (.*[^\\]) ").unwrap();
-    let last = Regex::new(r".*[^\\] (.*)$").unwrap();
+    let rgx = Regex::new(r"[^\\][\s]+(.*[^\\])[\s]+").unwrap();
+    let last = Regex::new(r".*[^\\][\s]+(.*)$").unwrap();
     let mut res = Vec::with_capacity(64);
 
     for i in rgx.captures_iter(theString) {
@@ -120,6 +133,7 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
     //let replCmd = "ls -lh".to_string();
     println!("TWEAKED COMM! |{}|",replCmd);
     let arr = argArray(&replCmd);
+    println!("ARG ARRAY: |{:?}|",arr);
 
     let mut procVar = std::process::Command::new(&arr[0]);
     procVar.current_dir(&comm.dir);
@@ -131,6 +145,7 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
 
     let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
+    println!("HEADERS! |{}|",headerString);
 
     let mut fileList = parseFileList(&headerString);
     fileList.push(comm.file);
@@ -143,7 +158,6 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
     };
 
     send.send(jerb);
-    //println!("HEADERS! |{}|",headerString);
 }
 
 fn listen(inst: MyAppInstance) {
@@ -196,6 +210,7 @@ fn main() {
                 SqliteJob::InsertMany{ files: vec, context: ctx, dir: dir, flags: flg } => {
                     dbConn.execute("BEGIN;",&[]);
                     for i in vec {
+                        println!("INSERTIN': |{}|",i);
                         dbConn.execute("
                             INSERT INTO flags (
                                 context,
@@ -249,7 +264,7 @@ fn main() {
 
     // synchronize, one for db
     // other for processing
-    std::thread::sleep_ms(500);
+    std::thread::sleep_ms(50000);
     inst.indexSender.send(CommandIndexJob::Stop);
     inst.sqliteQuerySender.send(SqliteJob::Stop);
     rxEnd.recv();

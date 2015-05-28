@@ -81,18 +81,6 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
 }
 
 fn argArray(target: &str) -> Vec<String> {
-    //let mut res = Vec::with_capacity(16);
-    //let trimSpace = Regex::new(r"\s[\s]+").unwrap();
-    //let iterRgx = Regex::new(r"([^\\] )?(.*?[^\\]) ").unwrap();
-    //let tailRgx = Regex::new(r"[^\\] ([^\s]+)$").unwrap();
-    //let repl = trimSpace.replace_all(target," ");
-    //for cap in iterRgx.captures_iter(&repl) {
-        //res.push(cap.at(2).unwrap().to_string());
-    //}
-    //for cap in tailRgx.captures_iter(&repl) {
-        //res.push(cap.at(1).unwrap().to_string());
-    //}
-    //res
     let mut res = Vec::<String>::with_capacity(3);
     res.push("/bin/sh".to_string());
     res.push("-c".to_string());
@@ -107,6 +95,22 @@ fn test_arg_splitter() {
     assert!( out[0] == "/bin/sh" );
     assert!( out[1] == "-c" );
     assert!( out[2] == theStr );
+}
+
+fn parseFileList(theString: &str) -> Vec<String> {
+    let rgx = Regex::new(r"[^\\] (.*[^\\]) ").unwrap();
+    let last = Regex::new(r".*[^\\] (.*)$").unwrap();
+    let mut res = Vec::with_capacity(64);
+
+    for i in rgx.captures_iter(theString) {
+        res.push(i.at(1).unwrap().to_string());
+    }
+
+    for i in last.captures_iter(theString) {
+        res.push(i.at(1).unwrap().to_string());
+    }
+
+    res
 }
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {

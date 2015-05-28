@@ -102,14 +102,11 @@ fn argArray(target: &str) -> Vec<String> {
 
 #[test]
 fn test_arg_splitter() {
-    let out = argArray("g++   shazzlow\\ cxx \"stuff wit space\" -g -o yo.txt");
-    println!("|{}|",out[4]);
-    assert!( out[0] == "g++" );
-    assert!( out[1] == "shazzlow\\ cxx" );
-    assert!( out[2] == "stuff wit space" );
-    assert!( out[3] == "-g" );
-    assert!( out[4] == "-o" );
-    assert!( out[5] == "yo.txt" );
+    let theStr = "g++   shazzlow\\ cxx \"stuff wit space\" -g -o yo.txt";
+    let out = argArray(theStr);
+    assert!( out[0] == "/bin/sh" );
+    assert!( out[1] == "-c" );
+    assert!( out[2] == theStr );
 }
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {

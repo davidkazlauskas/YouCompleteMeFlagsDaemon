@@ -81,29 +81,35 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
 }
 
 fn argArray(target: &str) -> Vec<String> {
-    let mut res = Vec::with_capacity(16);
-    let trimSpace = Regex::new(r"\s[\s]+").unwrap();
-    let iterRgx = Regex::new(r"([^\\] )?(.*?[^\\]) ").unwrap();
-    let tailRgx = Regex::new(r"[^\\] ([^\s]+)$").unwrap();
-    let repl = trimSpace.replace_all(target," ");
-    for cap in iterRgx.captures_iter(&repl) {
-        res.push(cap.at(2).unwrap().to_string());
-    }
-    for cap in tailRgx.captures_iter(&repl) {
-        res.push(cap.at(1).unwrap().to_string());
-    }
+    //let mut res = Vec::with_capacity(16);
+    //let trimSpace = Regex::new(r"\s[\s]+").unwrap();
+    //let iterRgx = Regex::new(r"([^\\] )?(.*?[^\\]) ").unwrap();
+    //let tailRgx = Regex::new(r"[^\\] ([^\s]+)$").unwrap();
+    //let repl = trimSpace.replace_all(target," ");
+    //for cap in iterRgx.captures_iter(&repl) {
+        //res.push(cap.at(2).unwrap().to_string());
+    //}
+    //for cap in tailRgx.captures_iter(&repl) {
+        //res.push(cap.at(1).unwrap().to_string());
+    //}
+    //res
+    let mut res = Vec::<String>::with_capacity(3);
+    res.push("/bin/sh".to_string());
+    res.push("-c".to_string());
+    res.push(target.to_string());
     res
 }
 
 #[test]
 fn test_arg_splitter() {
-    let out = argArray("g++   shazzlow\\ cxx -g -o yo.txt");
+    let out = argArray("g++   shazzlow\\ cxx \"stuff wit space\" -g -o yo.txt");
     println!("|{}|",out[4]);
     assert!( out[0] == "g++" );
     assert!( out[1] == "shazzlow\\ cxx" );
-    assert!( out[2] == "-g" );
-    assert!( out[3] == "-o" );
-    assert!( out[4] == "yo.txt" );
+    assert!( out[2] == "stuff wit space" );
+    assert!( out[3] == "-g" );
+    assert!( out[4] == "-o" );
+    assert!( out[5] == "yo.txt" );
 }
 
 fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
@@ -124,6 +130,9 @@ fn indexSource(comm: Command,context: &String,send: Sender<SqliteJob>) {
 
     let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
+
+    let fileList: Vec<String> = Vec::with_capacity(64);
+
     println!("HEADERS! |{}|",headerString);
 }
 

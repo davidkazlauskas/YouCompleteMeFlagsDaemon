@@ -107,11 +107,11 @@ fn test_out_parser() {
     let conv = theStr.to_string();
 
     let out = parseFileList(&conv);
-    assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp" );
+    assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir wit space/tests-templatious/ChainFunctor.cpp" );
     assert!( out[1] == "/usr/include/stdc-predef.h" );
     assert!( out[2] == "/usr/include/c++/4.9/cstring" );
-    assert!( out[3] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp" );
-    assert!( out[4] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp" );
+    assert!( out[3] == "/home/deividas/Desktop/ramdisk/dir wit space/tests-templatious/detail/ConstructorCountCollection.hpp" );
+    assert!( out[4] == "/home/deividas/Desktop/ramdisk/dir wit space/tests-templatious/TestDefs.hpp" );
 }
 
 fn parseFileList(theString: &String) -> Vec<String> {
@@ -134,10 +134,16 @@ fn parseFileList(theString: &String) -> Vec<String> {
 }
 
 fn resolveToAbsPath(relPath: &String) -> String {
+    let repl = relPath.replace("\\","");
     let mut procVar = std::process::Command::new("readlink");
-    procVar.arg("-m").arg(&relPath);
+    procVar.arg("-m").arg(&repl);
     let output = procVar.output().unwrap();
-    return output.stdout;
+    let trimRgx = Regex::new(r"^\s*(.*?)\s*$").unwrap();
+    if (output.status.code().unwrap() == 0) {
+        let firstStr = String::from_utf8(output.stdout).unwrap();
+        return trimRgx.replace_all(&firstStr,"$1");
+    }
+    return repl;
 }
 
 fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {

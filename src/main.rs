@@ -99,30 +99,37 @@ fn test_arg_splitter() {
 
 #[test]
 fn test_out_parser() {
-    let theStr = "ChainFunctor.o: \n
-     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp \\
-     /usr/include/stdc-predef.h /usr/include/c++/4.9/cstring \\
-     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp \n
-     /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\\";
+    let theStr = "ChainFunctor.o: \\\n
+/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp \\\n
+/usr/include/stdc-predef.h /usr/include/c++/4.9/cstring \\\n
+/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp \\\n
+/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\\\n";
+    let conv = theStr.to_string();
 
-    let out = parseFileList(theStr);
-    println!("|{}|",out[2]);
+    let out = parseFileList(&conv);
+    //println!("|{}|",out[2]);
     assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp" );
     assert!( out[1] == "/usr/include/stdc-predef.h" );
     assert!( out[2] == "/usr/include/c++/4.9/cstring" );
 }
 
-fn parseFileList(theString: &str) -> Vec<String> {
-    let rgx = Regex::new(r"[^\\][\s]+([^\\].*?[^\\])\s+").unwrap();
-    let last = Regex::new(r".*[^\\][\s]+([^\\].*?)[\s]+$").unwrap();
+fn parseFileList(theString: &String) -> Vec<String> {
+    //let rgx = Regex::new(r"\s+([^\\].*?[^\\])\s+").unwrap();
+    let rplStr = theString.replace("\\ ","@@@");
+    println!("@|{}|",rplStr);
+    let rgx = Regex::new(r"([@/\w\._+:-]+)").unwrap();
+    //let rgx = Regex::new(r"\s+([^\\][\w/\.-_ ]+[^\\])\s+").unwrap();
+    //let last = Regex::new(r".*\s+([^\\].*?)[^\\]\s+$").unwrap();
+    let last = Regex::new(r".*\s+([^\\].*?)[^\\]\s+$").unwrap();
     let mut res = Vec::with_capacity(64);
 
-    for i in rgx.captures_iter(theString) {
-        res.push(i.at(1).unwrap().to_string());
-    }
-
-    for i in last.captures_iter(theString) {
-        res.push(i.at(1).unwrap().to_string());
+    for i in rgx.captures_iter(&rplStr) {
+        let grCap = i.at(1).unwrap().to_string();
+        let replBack = grCap.replace("@@@","\\ ");
+        if (!replBack.contains(":")) {
+            println!("NRM |{}|",replBack);
+            res.push(replBack);
+        }
     }
 
     res

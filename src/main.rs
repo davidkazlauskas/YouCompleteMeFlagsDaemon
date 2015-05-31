@@ -124,21 +124,26 @@ fn parseFileList(theString: &String) -> Vec<String> {
         let grCap = i.at(1).unwrap().to_string();
         let replBack = grCap.replace("@@@","\\ ");
         if (!replBack.contains(":")) {
-            println!("NRM |{}|",replBack);
-            res.push(replBack);
+            let resolved = resolveToAbsPath(&replBack);
+            println!("NRM |{}|",resolved);
+            res.push(resolved);
         }
     }
 
     res
 }
 
+fn resolveToAbsPath(relPath: &String) -> String {
+    let mut procVar = std::process::Command::new("readlink");
+    procVar.arg("-m").arg(&relPath);
+    let output = procVar.output().unwrap();
+    return output.stdout;
+}
+
 fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
-    println!("WOULD INDEX! |{}| {:?}",context,comm);
     let dropOut = Regex::new(r"^(.*?)[\s]+-o[\s]+.*?\s(-.*?)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
-    println!("TWEAKED COMM! |{}|",replCmd);
     let arr = argArray(&replCmd);
-    println!("ARG ARRAY: |{:?}|",arr);
 
     let mut procVar = std::process::Command::new(&arr[0]);
     procVar.current_dir(&comm.dir);
@@ -150,7 +155,6 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
 
     let output = procVar.output().unwrap();
     let headerString = String::from_utf8(output.stdout).unwrap();
-    println!("HEADERS! |{}|",headerString);
 
     let mut fileList = parseFileList(&headerString);
     fileList.push(comm.file);

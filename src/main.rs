@@ -107,20 +107,17 @@ fn test_out_parser() {
     let conv = theStr.to_string();
 
     let out = parseFileList(&conv);
-    //println!("|{}|",out[2]);
     assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp" );
     assert!( out[1] == "/usr/include/stdc-predef.h" );
     assert!( out[2] == "/usr/include/c++/4.9/cstring" );
+    assert!( out[3] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/ConstructorCountCollection.hpp" );
+    assert!( out[4] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp" );
 }
 
 fn parseFileList(theString: &String) -> Vec<String> {
-    //let rgx = Regex::new(r"\s+([^\\].*?[^\\])\s+").unwrap();
     let rplStr = theString.replace("\\ ","@@@");
     println!("@|{}|",rplStr);
     let rgx = Regex::new(r"([@/\w\._+:-]+)").unwrap();
-    //let rgx = Regex::new(r"\s+([^\\][\w/\.-_ ]+[^\\])\s+").unwrap();
-    //let last = Regex::new(r".*\s+([^\\].*?)[^\\]\s+$").unwrap();
-    let last = Regex::new(r".*\s+([^\\].*?)[^\\]\s+$").unwrap();
     let mut res = Vec::with_capacity(64);
 
     for i in rgx.captures_iter(&rplStr) {
@@ -139,7 +136,6 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
     println!("WOULD INDEX! |{}| {:?}",context,comm);
     let dropOut = Regex::new(r"^(.*?)[\s]+-o[\s]+.*?\s(-.*?)$").unwrap();
     let replCmd = dropOut.replace_all(&comm.command,"$1 -M $2");
-    //let replCmd = "ls -lh".to_string();
     println!("TWEAKED COMM! |{}|",replCmd);
     let arr = argArray(&replCmd);
     println!("ARG ARRAY: |{:?}|",arr);

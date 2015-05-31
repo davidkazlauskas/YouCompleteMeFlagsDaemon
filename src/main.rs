@@ -106,13 +106,15 @@ fn test_out_parser() {
      /home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/detail/../TestDefs.hpp\\";
 
     let out = parseFileList(theStr);
-    println!("|{}|",out[0]);
+    println!("|{}|",out[2]);
     assert!( out[0] == "/home/deividas/Desktop/ramdisk/dir\\ wit\\ space/tests-templatious/ChainFunctor.cpp" );
+    assert!( out[1] == "/usr/include/stdc-predef.h" );
+    assert!( out[2] == "/usr/include/c++/4.9/cstring" );
 }
 
 fn parseFileList(theString: &str) -> Vec<String> {
-    let rgx = Regex::new(r"[^\\][\s]+(.*?[^\\])[\s]+").unwrap();
-    let last = Regex::new(r".*[^\\][\s]+(.*?)[\s]+$").unwrap();
+    let rgx = Regex::new(r"[^\\][\s]+([^\\].*?[^\\])\s+").unwrap();
+    let last = Regex::new(r".*[^\\][\s]+([^\\].*?)[\s]+$").unwrap();
     let mut res = Vec::with_capacity(64);
 
     for i in rgx.captures_iter(theString) {

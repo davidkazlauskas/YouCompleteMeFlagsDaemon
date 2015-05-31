@@ -163,6 +163,16 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
     };
 
     send.send(jerb);
+
+    let filterOutDupes = SqliteJob::RunQuery(
+        "DELETE FROM flags
+         WHERE id NOT IN (
+             SELECT MAX(id)
+             FROM flags
+             GROUP BY filename, context
+         )".to_string()
+    );
+    send.send(filterOutDupes);
 }
 
 fn listen(inst: MyAppInstance) {
@@ -215,7 +225,6 @@ fn main() {
                 SqliteJob::InsertMany{ files: vec, context: ctx, dir: dir, flags: flg } => {
                     dbConn.execute("BEGIN;",&[]);
                     for i in vec {
-                        println!("INSERTIN': |{}|",i);
                         dbConn.execute("
                             INSERT INTO flags (
                                 context,

@@ -125,7 +125,6 @@ fn parseFileList(theString: &String) -> Vec<String> {
         let replBack = grCap.replace("@@@","\\ ");
         if (!replBack.contains(":")) {
             let resolved = resolveToAbsPath(&replBack);
-            println!("NRM |{}|",resolved);
             res.push(resolved);
         }
     }

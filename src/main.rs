@@ -138,9 +138,12 @@ fn resolveToAbsPath(relPath: &String) -> String {
     procVar.arg("-m").arg(&repl);
     let output = procVar.output().unwrap();
     let trimRgx = Regex::new(r"^\s*(.*?)\s*$").unwrap();
+    let slashRepRgx = Regex::new(r"/.*?/\.\./").unwrap();
     if (output.status.code().unwrap() == 0) {
         let firstStr = String::from_utf8(output.stdout).unwrap();
-        return trimRgx.replace_all(&firstStr,"$1");
+        let trimmed = trimRgx.replace_all(&firstStr,"$1");
+        let doubleDotRemoved = slashRepRgx.replace_all(&trimmed,"/");
+        return doubleDotRemoved;
     }
     return repl;
 }

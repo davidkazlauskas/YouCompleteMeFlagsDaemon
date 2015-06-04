@@ -223,9 +223,12 @@ fn main() {
                     keepGoing = false;
                 },
                 SqliteJob::RunQuery(msg) => {
+                    println!("Running filter query...");
                     dbConn.execute(&msg,&[]);
+                    println!("Ran!");
                 },
                 SqliteJob::InsertMany{ files: vec, context: ctx, dir: dir, flags: flg } => {
+                    println!("Inserting {} files...",vec.len())
                     dbConn.execute("BEGIN;",&[]);
                     for i in vec {
                         dbConn.execute("
@@ -238,6 +241,7 @@ fn main() {
                         ",&[&ctx,&i,&dir,&flg]);
                     }
                     dbConn.execute("COMMIT;",&[]);
+                    println!("Inserted!");
                 },
             }
         }

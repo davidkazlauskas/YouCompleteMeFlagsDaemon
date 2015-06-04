@@ -135,9 +135,10 @@ fn parseFileList(theString: &String) -> Vec<String> {
 fn resolveToAbsPath(relPath: &String) -> String {
     let repl = relPath.replace("\\","");
     let trimRgx = Regex::new(r"^\s*(.*?)\s*$").unwrap();
-    let slashRepRgx = Regex::new(r"/.+/\.\./").unwrap();
+    let slashRepRgx = Regex::new(r"/[^/]+/\.\./").unwrap();
     let trimmed = trimRgx.replace_all(&repl,"$1");
     let doubleDotRemoved = slashRepRgx.replace_all(&trimmed,"/");
+    println!("TEH BOSS |{}|",doubleDotRemoved);
     return doubleDotRemoved;
 }
 

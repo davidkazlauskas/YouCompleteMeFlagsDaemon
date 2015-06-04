@@ -134,18 +134,11 @@ fn parseFileList(theString: &String) -> Vec<String> {
 
 fn resolveToAbsPath(relPath: &String) -> String {
     let repl = relPath.replace("\\","");
-    let mut procVar = std::process::Command::new("readlink");
-    procVar.arg("-m").arg(&repl);
-    let output = procVar.output().unwrap();
     let trimRgx = Regex::new(r"^\s*(.*?)\s*$").unwrap();
-    let slashRepRgx = Regex::new(r"/.*?/\.\./").unwrap();
-    if (output.status.code().unwrap() == 0) {
-        let firstStr = String::from_utf8(output.stdout).unwrap();
-        let trimmed = trimRgx.replace_all(&firstStr,"$1");
-        let doubleDotRemoved = slashRepRgx.replace_all(&trimmed,"/");
-        return doubleDotRemoved;
-    }
-    return repl;
+    let slashRepRgx = Regex::new(r"/.+/\.\./").unwrap();
+    let trimmed = trimRgx.replace_all(&repl,"$1");
+    let doubleDotRemoved = slashRepRgx.replace_all(&trimmed,"/");
+    return doubleDotRemoved;
 }
 
 fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {

@@ -228,7 +228,7 @@ fn main() {
                     println!("Ran!");
                 },
                 SqliteJob::InsertMany{ files: vec, context: ctx, dir: dir, flags: flg } => {
-                    println!("Inserting {} files...",vec.len())
+                    println!("Inserting {} files...",vec.len());
                     dbConn.execute("BEGIN;",&[]);
                     for i in vec {
                         dbConn.execute("

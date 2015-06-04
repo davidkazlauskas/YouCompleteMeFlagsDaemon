@@ -60,7 +60,6 @@ fn parseCommands(string: &String) -> Vec<Command> {
             file: obj.get("file").unwrap()
                 .as_string().unwrap().to_string(),
         };
-        println!("{:?}",comm);
         commands.push(comm);
     }
     commands
@@ -116,7 +115,6 @@ fn test_out_parser() {
 
 fn parseFileList(theString: &String) -> Vec<String> {
     let rplStr = theString.replace("\\ ","@@@");
-    println!("@|{}|",rplStr);
     let rgx = Regex::new(r"([@/\w\._+:-]+)").unwrap();
     let mut res = Vec::with_capacity(64);
 
@@ -138,7 +136,6 @@ fn resolveToAbsPath(relPath: &String) -> String {
     let slashRepRgx = Regex::new(r"/[^/]+/\.\./").unwrap();
     let trimmed = trimRgx.replace_all(&repl,"$1");
     let doubleDotRemoved = slashRepRgx.replace_all(&trimmed,"/");
-    println!("TEH BOSS |{}|",doubleDotRemoved);
     return doubleDotRemoved;
 }
 

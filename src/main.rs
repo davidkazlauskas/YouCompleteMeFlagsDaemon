@@ -51,9 +51,9 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
             path: String::from(spl[2].trim()),
             context: String::from(spl[1].trim()),
         };
-        println!("PROCBRANCH");
         inst.indexSender.send(jerb);
     } else if firstTrimmed == "s" { // stop
+        println!("End signal received, shutting down...");
         inst.indexSender.send(CommandIndexJob::Stop);
         inst.sqliteQuerySender.send(SqliteJob::Stop);
         inst.endRecv.recv();

@@ -83,6 +83,7 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
                     format!("e|cannot query for flags")
                 }
             };
+        println!("Query served [{}]",resp);
         stream.write(&resp.into_bytes());
     }
 

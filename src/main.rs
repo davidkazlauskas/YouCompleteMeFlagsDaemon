@@ -68,12 +68,21 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         let path = String::from(spl[2].trim());
         inst.sqliteQuerySender.send(
             SqliteJob::QueryFile{
-                context: context,
-                path: path,
+                context: context.clone(),
+                path: path.clone(),
                 txCmd: inst.queryResultSender.clone(),
             }
         );
-        let out = inst.queryResultReceiver.recv();
+        let out = inst.queryResultReceiver.recv().unwrap();
+        let resp =
+            match out {
+                Ok(res) => {
+                    format!("g|{}|{}|{}",context,path,res.command);
+                },
+                Err(err) => {
+                    format!("e|cannot query for flags");
+                }
+            };
     }
 
     return true;

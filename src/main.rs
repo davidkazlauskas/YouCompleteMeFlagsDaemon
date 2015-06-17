@@ -43,8 +43,9 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     stream.read_to_string(&mut theStr);
     println!("{}",theStr);
     let mut chars = theStr.chars();
-    if chars.nth(0).unwrap() == 'p' {
-    
+    let first = chars.nth(0).unwrap();
+    if first == 'p' {
+
     }
 }
 

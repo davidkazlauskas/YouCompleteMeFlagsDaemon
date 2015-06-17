@@ -6,7 +6,7 @@ extern crate threadpool;
 extern crate regex;
 
 use std::sync::mpsc::channel;
-use std::sync::mpsc::Sender;
+use std::sync::mpsc::{Sender,Receiver};
 use std::thread;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
@@ -35,6 +35,7 @@ enum SqliteJob {
 struct MyAppInstance {
     indexSender: Sender<CommandIndexJob>,
     sqliteQuerySender: Sender<SqliteJob>,
+    endRecv: Receiver<i32>,
 }
 
 fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
@@ -45,14 +46,20 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     let spl: Vec<String> = theStr.split("|")
         .map(|slice| { String::from(slice) }).collect();
     let firstTrimmed = String::from(spl[0].trim());
-    if firstTrimmed == "p" {
+    if firstTrimmed == "p" { // process
         let jerb = CommandIndexJob::ProcessCompCommands {
             path: String::from(spl[2].trim()),
             context: String::from(spl[1].trim()),
         };
         println!("PROCBRANCH");
         inst.indexSender.send(jerb);
+    } else if firstTrimmed == "s" { // stop
+        inst.indexSender.send(CommandIndexJob::Stop);
+        inst.sqliteQuerySender.send(SqliteJob::Stop);
+        inst.endRecv.recv();
+        inst.endRecv.recv();
     }
+
 }
 
 fn parseCommands(string: &String) -> Vec<Command> {
@@ -222,6 +229,7 @@ fn main() {
     let inst = MyAppInstance {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
+        endRecv: rxEnd,
     };
 
     let dbConn = SqliteConnection::open(&"flags.sqlite").unwrap();

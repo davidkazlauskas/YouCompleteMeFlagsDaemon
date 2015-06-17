@@ -325,8 +325,16 @@ fn main() {
 
                     match iter {
                         Ok(mut theIter) => {
-                            let toSend = theIter.next().unwrap();
-                            txCmd.send(toSend);
+                            let next = theIter.next();
+                            match next {
+                                Some(toSend) => {
+                                    txCmd.send(toSend);
+                                },
+                                None => {
+                                    //txCmd.send(toSend);
+                                },
+                            };
+                            //let toSend = theIter.next();
                         },
                         Err(err) => {
                             println!("Sqlite error: {}",err);

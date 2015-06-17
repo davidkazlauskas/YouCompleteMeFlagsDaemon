@@ -30,12 +30,13 @@ enum SqliteJob {
     Stop,
     RunQuery(String),
     InsertMany{ files: Vec<String>,context: String,dir: String,flags: String },
-    QueryFile{ context: String, path: String, txCmd: Sender<Command> },
+    QueryFile{ context: String, path: String, txCmd: Sender<
+        Result<Command, rusqlite::SqliteError > > },
 }
 
 struct MyAppInstance {
     indexSender: Sender<CommandIndexJob>,
-    sqliteQuerySender: Sender<SqliteJob>,
+    sqliteQuerySender: Sender< SqliteJob >,
     endRecv: Receiver<i32>,
 }
 
@@ -258,6 +259,10 @@ fn main() {
     let dbEndClone = txEnd.clone();
     thread::spawn(move|| {
         let mut keepGoing = true;
+        let mut stmt = dbConn.prepare("
+           SELECT filename,dir,flags FROM flags
+           WHERE context=='$1';
+        ").unwrap();
         while (keepGoing) {
             let res = rxQuery.recv().unwrap();
             match res {
@@ -286,7 +291,23 @@ fn main() {
                     println!("Inserted!");
                 },
                 SqliteJob::QueryFile{ context: ctx, path: path, txCmd: txCmd } => {
+                    let iter = stmt.query_map(&[&ctx], |row| {
+                        Command {
+                            file: row.get(0),
+                            dir: row.get(1),
+                            command: row.get(2),
+                        }
+                    });
 
+                    match iter {
+                        Ok(mut theIter) => {
+                            let toSend = theIter.next().unwrap();
+                            txCmd.send(toSend);
+                        },
+                        Err(err) => {
+                            println!("Sqlite error: {}",err);
+                        },
+                    };
                 },
             }
         }

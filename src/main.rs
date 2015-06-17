@@ -38,7 +38,7 @@ struct MyAppInstance {
     endRecv: Receiver<i32>,
 }
 
-fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
+fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
     println!("DOIN IT");
     let mut theStr = String::with_capacity(1024 * 2);
     stream.read_to_string(&mut theStr);
@@ -58,8 +58,10 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
         inst.sqliteQuerySender.send(SqliteJob::Stop);
         inst.endRecv.recv();
         inst.endRecv.recv();
+        return false;
     }
 
+    return true;
 }
 
 fn parseCommands(string: &String) -> Vec<Command> {
@@ -212,7 +214,8 @@ fn listen(inst: MyAppInstance) {
             for stream in listen.incoming() {
                 match stream {
                     Ok(stream) => {
-                        handleStream(&inst,stream);
+                        let res = handleStream(&inst,stream);
+                        if !res { return; };
                     }
                     Err(e) => {
                         println!("{}",e);

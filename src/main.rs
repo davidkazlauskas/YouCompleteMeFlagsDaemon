@@ -49,6 +49,7 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
             path: spl[2].clone(),
             context: spl[1].clone(),
         };
+        println!("PROCBRANCH");
         inst.indexSender.send(jerb);
     }
 }
@@ -78,13 +79,20 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     use std::io::prelude::*;
     use std::fs::File;
 
-    let mut f = File::open(&filepath).unwrap();
-    let mut contents = String::with_capacity(1024 * 64);
-    f.read_to_string(&mut contents);
-    let parseRes = parseCommands(&contents);
-    for i in parseRes {
-        send.send(CommandIndexJob::IndexSource{
-            comm: i, context: projectName.clone() });
+    let mut f = File::open(&filepath);
+    match f {
+        Ok(mut succ) => {
+            let mut contents = String::with_capacity(1024 * 64);
+            succ.read_to_string(&mut contents);
+            let parseRes = parseCommands(&contents);
+            for i in parseRes {
+                send.send(CommandIndexJob::IndexSource{
+                    comm: i, context: projectName.clone() });
+            }
+        },
+        Err(err) => {
+            println!("File open error: {}",err);
+        }
     }
 }
 
@@ -284,22 +292,5 @@ fn main() {
         idxEndClone.send(7);
     });
 
-    //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
-    //hitTheFile(cmd,"moo".to_string());
-    //let jerb = CommandIndexJob::ProcessCompCommands {
-        //path: "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string(),
-        //context: "shazzlow".to_string(),
-    //};
-    //inst.indexSender.send(jerb);
-
-    //// synchronize, one for db
-    //// other for processing
-    //std::thread::sleep_ms(50000);
-    //inst.indexSender.send(CommandIndexJob::Stop);
-    //inst.sqliteQuerySender.send(SqliteJob::Stop);
-    //rxEnd.recv();
-    //rxEnd.recv();
-
-    //listen(inst);
     listen(inst);
 }

@@ -284,7 +284,7 @@ fn main() {
         let mut keepGoing = true;
         let mut stmt = dbConn.prepare("
            SELECT filename,dir,flags FROM flags
-           WHERE context=='$1';
+           WHERE context==$1;
         ").unwrap();
         while (keepGoing) {
             let res = rxQuery.recv().unwrap();

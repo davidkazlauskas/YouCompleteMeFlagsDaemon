@@ -37,11 +37,15 @@ struct MyAppInstance {
     sqliteQuerySender: Sender<SqliteJob>,
 }
 
-fn handleStream(mut stream: TcpStream) {
+fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     println!("DOIN IT");
     let mut theStr = String::with_capacity(1024 * 2);
     stream.read_to_string(&mut theStr);
     println!("{}",theStr);
+    let mut chars = theStr.chars();
+    if chars.nth(0).unwrap() == 'p' {
+    
+    }
 }
 
 fn parseCommands(string: &String) -> Vec<Command> {
@@ -183,7 +187,7 @@ fn listen(inst: MyAppInstance) {
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                handleStream(stream);
+                handleStream(&inst,stream);
             }
             Err(e) => {
                 println!("{}",e);

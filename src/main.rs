@@ -205,16 +205,24 @@ fn indexSource(comm: Command,context: String,send: Sender<SqliteJob>) {
 }
 
 fn listen(inst: MyAppInstance) {
-    let listener = TcpListener::bind("127.0.0.1:7777").unwrap();
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
-                handleStream(&inst,stream);
+    let listener = TcpListener::bind("127.0.0.1:7777");
+
+    match listener {
+        Ok(listen) => {
+            for stream in listen.incoming() {
+                match stream {
+                    Ok(stream) => {
+                        handleStream(&inst,stream);
+                    }
+                    Err(e) => {
+                        println!("{}",e);
+                    }
+                }
             }
-            Err(e) => {
-                println!("{}",e);
-            }
-        }
+        },
+        Err(err) => {
+            println!("Coudln't open stream: {}",err);
+        },
     }
 }
 

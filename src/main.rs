@@ -31,14 +31,14 @@ enum SqliteJob {
     RunQuery(String),
     InsertMany{ files: Vec<String>,context: String,dir: String,flags: String },
     QueryFile{ context: String, path: String, txCmd: Sender<
-        Result<Command, rusqlite::SqliteError > > },
+        Result< Command, String > > },
 }
 
 struct MyAppInstance {
     indexSender: Sender<CommandIndexJob>,
     sqliteQuerySender: Sender< SqliteJob >,
-    queryResultSender: Sender< Result<Command, rusqlite::SqliteError > >,
-    queryResultReceiver: Receiver< Result<Command, rusqlite::SqliteError > >,
+    queryResultSender: Sender< Result< Command, String > >,
+    queryResultReceiver: Receiver< Result< Command, String > >,
     endRecv: Receiver<i32>,
 }
 
@@ -327,17 +327,21 @@ fn main() {
                         Ok(mut theIter) => {
                             let next = theIter.next();
                             match next {
-                                Some(toSend) => {
-                                    txCmd.send(toSend);
+                                Some(presend) => {
+                                    match presend {
+                                        Ok(toSend) => txCmd.send(Ok(toSend)),
+                                        Err(err) => txCmd.send(Err(format!("{}",err))),
+                                    }
                                 },
                                 None => {
-                                    //txCmd.send(toSend);
+                                    txCmd.send(Err(format!("no-flags-found")))
                                 },
                             };
                             //let toSend = theIter.next();
                         },
                         Err(err) => {
                             println!("Sqlite error: {}",err);
+                            txCmd.send(Err(format!("Sqlite error: {}",err)));
                         },
                     };
                 },

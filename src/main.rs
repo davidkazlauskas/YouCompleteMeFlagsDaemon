@@ -59,6 +59,9 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         inst.endRecv.recv();
         inst.endRecv.recv();
         return false;
+    } else if firstTrimmed == "q" {
+        let context = String::from(spl[1].trim());
+        let path = String::from(spl[2].trim());
     }
 
     return true;

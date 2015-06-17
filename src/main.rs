@@ -45,7 +45,11 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     let spl: Vec<String> = theStr.split("|")
         .map(|slice| { String::from(slice) }).collect();
     if spl[0] == "p" {
-
+        let jerb = CommandIndexJob::ProcessCompCommands {
+            path: spl[2].clone(),
+            context: spl[1].clone(),
+        };
+        inst.indexSender.send(jerb);
     }
 }
 

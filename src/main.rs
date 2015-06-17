@@ -44,10 +44,11 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     println!("{}",theStr);
     let spl: Vec<String> = theStr.split("|")
         .map(|slice| { String::from(slice) }).collect();
-    if spl[0] == "p" {
+    let firstTrimmed = String::from(spl[0].trim());
+    if firstTrimmed == "p" {
         let jerb = CommandIndexJob::ProcessCompCommands {
-            path: spl[2].clone(),
-            context: spl[1].clone(),
+            path: String::from(spl[2].trim()),
+            context: String::from(spl[1].trim()),
         };
         println!("PROCBRANCH");
         inst.indexSender.send(jerb);
@@ -79,6 +80,7 @@ fn hitTheFile(filepath: String,projectName: String,send: Sender<CommandIndexJob>
     use std::io::prelude::*;
     use std::fs::File;
 
+    println!("About to index |{}|",filepath);
     let mut f = File::open(&filepath);
     match f {
         Ok(mut succ) => {

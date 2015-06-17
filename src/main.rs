@@ -30,6 +30,7 @@ enum SqliteJob {
     Stop,
     RunQuery(String),
     InsertMany{ files: Vec<String>,context: String,dir: String,flags: String },
+    QueryFile{ context: String, path: String, txCmd: Sender<Command> },
 }
 
 struct MyAppInstance {
@@ -283,6 +284,9 @@ fn main() {
                     }
                     dbConn.execute("COMMIT;",&[]);
                     println!("Inserted!");
+                },
+                SqliteJob::QueryFile{ context: ctx, path: path, txCmd: txCmd } => {
+
                 },
             }
         }

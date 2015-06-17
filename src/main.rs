@@ -77,12 +77,13 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         let resp =
             match out {
                 Ok(res) => {
-                    format!("g|{}|{}|{}",context,path,res.command);
+                    format!("g|{}|{}|{}",context,path,res.command)
                 },
                 Err(err) => {
-                    format!("e|cannot query for flags");
+                    format!("e|cannot query for flags")
                 }
             };
+        stream.write(&resp.into_bytes());
     }
 
     return true;

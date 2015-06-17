@@ -37,6 +37,8 @@ enum SqliteJob {
 struct MyAppInstance {
     indexSender: Sender<CommandIndexJob>,
     sqliteQuerySender: Sender< SqliteJob >,
+    queryResultSender: Sender< Result<Command, rusqlite::SqliteError > >,
+    queryResultReceiver: Receiver< Result<Command, rusqlite::SqliteError > >,
     endRecv: Receiver<i32>,
 }
 
@@ -64,6 +66,14 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
     } else if firstTrimmed == "q" {
         let context = String::from(spl[1].trim());
         let path = String::from(spl[2].trim());
+        inst.sqliteQuerySender.send(
+            SqliteJob::QueryFile{
+                context: context,
+                path: path,
+                txCmd: inst.queryResultSender.clone(),
+            }
+        );
+        let out = inst.queryResultReceiver.recv();
     }
 
     return true;
@@ -239,12 +249,15 @@ fn main() {
 
     let (txJob,rxJob) = channel::<CommandIndexJob>();
     let (txQuery,rxQuery) = channel::<SqliteJob>();
+    let (txQueryFile,rxQueryFile) = channel();
     let (txEnd,rxEnd) = channel::<i32>();
     let clonedTxJob = txJob.clone();
     let clonedTxQuery = txQuery.clone();
     let inst = MyAppInstance {
         indexSender: txJob,
         sqliteQuerySender: txQuery,
+        queryResultSender: txQueryFile,
+        queryResultReceiver: rxQueryFile,
         endRecv: rxEnd,
     };
 

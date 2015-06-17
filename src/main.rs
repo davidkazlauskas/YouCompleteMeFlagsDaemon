@@ -42,9 +42,9 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) {
     let mut theStr = String::with_capacity(1024 * 2);
     stream.read_to_string(&mut theStr);
     println!("{}",theStr);
-    let mut chars = theStr.chars();
-    let first = chars.nth(0).unwrap();
-    if first == 'p' {
+    let spl: Vec<String> = theStr.split("|")
+        .map(|slice| { String::from(slice) }).collect();
+    if spl[0] == "p" {
 
     }
 }

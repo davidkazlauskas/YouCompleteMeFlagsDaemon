@@ -285,7 +285,7 @@ fn main() {
         let mut keepGoing = true;
         let mut stmt = dbConn.prepare("
            SELECT filename,dir,flags FROM flags
-           WHERE context==$1;
+           WHERE context==$1 AND filename==$2;
         ").unwrap();
         while (keepGoing) {
             let res = rxQuery.recv().unwrap();
@@ -315,7 +315,7 @@ fn main() {
                     println!("Inserted!");
                 },
                 SqliteJob::QueryFile{ context: ctx, path: path, txCmd: txCmd } => {
-                    let iter = stmt.query_map(&[&ctx], |row| {
+                    let iter = stmt.query_map(&[&ctx,&path], |row| {
                         Command {
                             file: row.get(0),
                             dir: row.get(1),

@@ -286,19 +286,20 @@ fn main() {
 
     //let cmd = "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string();
     //hitTheFile(cmd,"moo".to_string());
-    let jerb = CommandIndexJob::ProcessCompCommands {
-        path: "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string(),
-        context: "shazzlow".to_string(),
-    };
-    inst.indexSender.send(jerb);
+    //let jerb = CommandIndexJob::ProcessCompCommands {
+        //path: "/home/deividas/Desktop/ramdisk/bld/compile_commands.json".to_string(),
+        //context: "shazzlow".to_string(),
+    //};
+    //inst.indexSender.send(jerb);
 
-    // synchronize, one for db
-    // other for processing
-    std::thread::sleep_ms(50000);
-    inst.indexSender.send(CommandIndexJob::Stop);
-    inst.sqliteQuerySender.send(SqliteJob::Stop);
-    rxEnd.recv();
-    rxEnd.recv();
+    //// synchronize, one for db
+    //// other for processing
+    //std::thread::sleep_ms(50000);
+    //inst.indexSender.send(CommandIndexJob::Stop);
+    //inst.sqliteQuerySender.send(SqliteJob::Stop);
+    //rxEnd.recv();
+    //rxEnd.recv();
 
     //listen(inst);
+    listen(inst);
 }

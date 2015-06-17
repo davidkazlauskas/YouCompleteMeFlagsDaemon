@@ -85,6 +85,7 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
             };
         println!("Query served [{}]",resp);
         stream.write(&resp.into_bytes());
+        stream.close();
     }
 
     return true;
@@ -337,7 +338,6 @@ fn main() {
                                     txCmd.send(Err(format!("no-flags-found")))
                                 },
                             };
-                            //let toSend = theIter.next();
                         },
                         Err(err) => {
                             println!("Sqlite error: {}",err);

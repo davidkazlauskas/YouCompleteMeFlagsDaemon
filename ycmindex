@@ -13,3 +13,5 @@ fi
 IDX_PATH=$PWD/$1
 IDX_REQ="p|$CURR_CONTEXT|$IDX_PATH"
 
+echo "$IDX_REQ" | nc localhost 7777
+

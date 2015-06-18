@@ -2,7 +2,7 @@
 
 CURR_CONTEXT=$2
 
-if [ -z "$CURR_CONTEXT"] && [ -z "$YCM_CONTEXT" ]:
+if [ -z "$CURR_CONTEXT" ] && [ -z "$YCM_CONTEXT" ];
 then
     echo "YCM_CONTEXT enviroment variable is undefined."
     exit 1

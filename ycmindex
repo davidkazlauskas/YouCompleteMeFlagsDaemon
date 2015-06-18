@@ -2,12 +2,15 @@
 
 CURR_CONTEXT=$2
 
-if [ -z "$CURR_CONTEXT" ] && [ -z "$YCM_CONTEXT" ];
+if [ -z "$CURR_CONTEXT" ];
 then
-    echo "YCM_CONTEXT enviroment variable is undefined."
-    exit 1
-else
-    CURR_CONTEXT=$YCM_CONTEXT
+    if [ -z "$YCM_CONTEXT" ];
+    then
+        echo "YCM_CONTEXT enviroment variable is undefined."
+        exit 1
+    else
+        CURR_CONTEXT=$YCM_CONTEXT
+    fi
 fi
 
 IDX_PATH=$PWD/$1

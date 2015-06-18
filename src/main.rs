@@ -64,6 +64,7 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         inst.endRecv.recv();
         return false;
     } else if firstTrimmed == "q" {
+        println!("Query about to be served...");
         let context = String::from(spl[1].trim());
         let path = String::from(spl[2].trim());
         inst.sqliteQuerySender.send(
@@ -77,17 +78,18 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         let resp =
             match out {
                 Ok(res) => {
-                    format!("g|{}|{}|{}",context,path,res.command)
+                    format!("g|{}|{}|{}\r\n",context,path,res.command)
                 },
                 Err(err) => {
-                    format!("e|cannot query for flags")
+                    format!("e|cannot query for flags\r\n")
                 }
             };
         println!("Query served [{}]",resp);
-        stream.write(&resp.into_bytes());
-        stream.close();
+        stream.write_all(&resp.into_bytes());
+        stream.shutdown(std::net::Shutdown::Both);
     }
 
+    println!("END CONNECTION");
     return true;
 }
 

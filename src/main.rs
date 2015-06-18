@@ -51,11 +51,16 @@ fn handleStream(mut inst: &MyAppInstance, mut stream: TcpStream) -> bool {
         .map(|slice| { String::from(slice) }).collect();
     let firstTrimmed = String::from(spl[0].trim());
     if firstTrimmed == "p" { // process
-        let jerb = CommandIndexJob::ProcessCompCommands {
-            path: String::from(spl[2].trim()),
-            context: String::from(spl[1].trim()),
-        };
-        inst.indexSender.send(jerb);
+        let context = String::from(spl[1].trim());
+        if context != "" {
+            let jerb = CommandIndexJob::ProcessCompCommands {
+                path: String::from(spl[2].trim()),
+                context: context,
+            };
+            inst.indexSender.send(jerb);
+        } else {
+            println!("Context must not be empty!");
+        }
     } else if firstTrimmed == "s" { // stop
         println!("End signal received, shutting down...");
         inst.indexSender.send(CommandIndexJob::Stop);

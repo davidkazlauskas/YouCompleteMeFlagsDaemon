@@ -1,0 +1,15 @@
+#!/bin/bash
+
+CURR_CONTEXT=$2
+
+if [ -z "$CURR_CONTEXT"] && [ -z "$YCM_CONTEXT" ]:
+then
+    echo "YCM_CONTEXT enviroment variable is undefined."
+    exit 1
+else
+    CURR_CONTEXT=$YCM_CONTEXT
+fi
+
+IDX_PATH=$PWD/$1
+IDX_REQ="p|$CURR_CONTEXT|$IDX_PATH"
+

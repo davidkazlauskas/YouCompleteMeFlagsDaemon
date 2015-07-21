@@ -1,0 +1,6 @@
+#!/bin/bash
+
+IDX_REQ="p|default|$1"
+
+echo "$IDX_REQ" | nc localhost 7777
+

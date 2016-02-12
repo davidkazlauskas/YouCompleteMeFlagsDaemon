@@ -21,11 +21,18 @@ Yeah, and this is the main and most important feature of this daemon. This daemo
 1. build rust daemon (obviously)
 2. launch daemon executable (built by rust) anywhere, it will open port 7777 (not configurable ATM, would appreciate patch for this)
 3. launch *EDITED FOR YOUR ENVIRONMENT* notifyhome script to keep monitoring for file changes involving compile_commands.json in the directory in where you build
-4. Never worry about messing with .ycm_extra_conf.py again
+4. Use ycm_extra_conf.py privided in this directory (globally, not per project)
+5. Never worry about messing with .ycm_extra_conf.py again
 
 I launch daemon and notifyhome from cron:
 ~~~~~~~
 @reboot /home/deividas/bin/daemonycm > /home/deividas/Desktop/ramdisk/ycmdaemon.log
 @reboot /home/deividas/bin/notifyhome > /home/deividas/Desktop/ramdisk/notify.log
+~~~~~~~
+
+My example configuration for using ycm_extra_conf.py:
+~~~~~~~
+let g:ycm_global_ycm_extra_conf = '/home/deividas/.vim/misc/ycm_extra_conf.py'
+let g:ycm_confirm_extra_conf=1
 ~~~~~~~
 

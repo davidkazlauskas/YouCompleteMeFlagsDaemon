@@ -3,7 +3,7 @@ Seamless youcompleteme flags fetcher for a file
 
 Tired of modifying .ycm_extra_conf.py ? Yeah, I know that feeling.
 
-With this short rust program I didn't have to touch .ycm_extra_conf.py for about a year now and I ALWAYS get auto completion automatically.
+With this short rust program I didn't have to touch .ycm_extra_conf.py for... I don't remember how long now and I ALWAYS get auto completion automatically.
 
 How is it so you might ask?
 

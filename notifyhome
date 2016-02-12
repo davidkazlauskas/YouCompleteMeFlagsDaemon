@@ -1,0 +1,13 @@
+#!/bin/bash
+
+inotifywait -m -r -e create -e moved_to /home/deividas/Desktop/ramdisk |
+    while read patch action file; do
+        FULL_PATH=$patch$file
+        if [[ "$FULL_PATH" == *"compile_commands.json" ]];
+        then
+            echo "sending: $FULL_PATH"
+            /home/deividas/bin/ycmindexabs "$FULL_PATH"
+            /home/deividas/bin/rc -J "$FULL_PATH"
+        fi
+    done
+

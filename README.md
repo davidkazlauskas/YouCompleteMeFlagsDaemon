@@ -16,10 +16,12 @@ But wait, what about headers? Only sources are compiled right?
 Yeah, and this is the main and most important feature of this daemon. This daemon calls compiler from compile_commands.json with -M flag to receive all the headers it used for compilation and applies the same flags to the headers as it did for source.
 
 
-How to run it?
+## How to run it?
+
 1. build rust daemon (obviously)
 2. launch daemon executable (built by rust) anywhere, it will open port 7777 (not configurable ATM, would appreciate patch for this)
 3. launch *EDITED FOR YOUR ENVIRONMENT* notifyhome script to keep monitoring for file changes involving compile_commands.json in the directory in where you build
+4. Never worry about messing with .ycm_extra_conf.py again
 
 I launch daemon and notifyhome from cron:
 ~~~~~~~
@@ -27,4 +29,3 @@ I launch daemon and notifyhome from cron:
 @reboot /home/deividas/bin/notifyhome > /home/deividas/Desktop/ramdisk/notify.log
 ~~~~~~~
 
-4. Never worry about messing with .ycm_extra_conf.py again

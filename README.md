@@ -9,7 +9,7 @@ How is it so you might ask?
 
 This short program runs a daemon that saves all flags it receives for an absolute path, therefore, whenever you open vim it asks for this daemon.
 
-It gets flags from compile_commands.json. This daemon itself does not monitor changes of that file, but rather, notifyhome script does that (modify it according to your environment).
+It gets flags from compile_commands.json ( I use cmake for everything. You don't? Tough, you probably won't enjoy autoflags easily :( ). This daemon itself does not monitor changes of that file, but rather, notifyhome script does that (modify it according to your environment).
 
 But wait, what about headers? Only sources are compiled right?
 
@@ -36,3 +36,7 @@ let g:ycm_global_ycm_extra_conf = '/home/deividas/.vim/misc/ycm_extra_conf.py'
 let g:ycm_confirm_extra_conf=1
 ~~~~~~~
 
+How to make cmake export compile_commands.json:
+~~~~~~~
+SET( CMAKE_EXPORT_COMPILE_COMMANDS yes )
+~~~~~~~

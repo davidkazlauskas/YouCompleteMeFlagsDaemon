@@ -43,9 +43,9 @@ def GetFromDaemon( context, filename ):
 
 
 def FlagsForFile( filename, **kwargs ):
-  fromDaemon = GetFromDaemon( "Shazzlow", filename )
+  fromDaemon = GetFromDaemon( "default", filename )
 
   return {
       'flags': fromDaemon,
-      'do_cache': True
+      'do_cache': False
   }
